@@ -1,0 +1,534 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Retrô 1980</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts para estilo retrô e Segment display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos personalizados para efeito vintage tátil */
+        body {
+            background-color: #1a1a1d;
+            background-image: 
+                radial-gradient(circle at 50% 30%, #2c2c35 0%, #111115 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.2) 2px, rgba(0, 0, 0, 0.2) 4px);
+            font-family: 'Share Tech Mono', monospace;
+            user-select: none;
+        }
+
+        /* Efeito de textura de plástico áspero dos anos 80 */
+        .retro-body {
+            background: linear-gradient(145deg, #d8d3c5 0%, #b8b2a1 50%, #a39d8c 100%);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.7),
+                inset 0 2px 3px rgba(255, 255, 255, 0.8),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.4);
+            border-radius: 20px 20px 30px 30px;
+            position: relative;
+        }
+
+        /* Moldura do Display VFD */
+        .display-bezel {
+            background: linear-gradient(180deg, #18191c 0%, #2a2b30 100%);
+            box-shadow: 
+                inset 0 4px 8px rgba(0, 0, 0, 0.9),
+                0 1px 1px rgba(255, 255, 255, 0.3);
+            border: 3px solid #38393e;
+        }
+
+        /* Tela de Tubo VFD Verde Fluorescente */
+        .vfd-screen {
+            background-color: #04140e;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanlines da tela */
+        .vfd-screen::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Digitos com brilho verde neon VFD */
+        .vfd-text {
+            font-family: 'VT323', monospace;
+            color: #33ff99;
+            text-shadow: 
+                0 0 2px #33ff99,
+                0 0 8px rgba(51, 255, 153, 0.6),
+                0 0 15px rgba(51, 255, 153, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .vfd-text-dim {
+            color: rgba(20, 60, 40, 0.25);
+            text-shadow: none;
+        }
+
+        /* Indicador de Operador */
+        .vfd-op {
+            font-family: 'Share Tech Mono', monospace;
+            color: #33ff99;
+            text-shadow: 0 0 5px rgba(51, 255, 153, 0.7);
+        }
+
+        /* Placa da Marca Metalizada */
+        .badge {
+            background: linear-gradient(90deg, #8a8e93 0%, #e2e8f0 50%, #64748b 100%);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+
+        /* Painel Solar / Grade Retrô */
+        .solar-panel {
+            background: linear-gradient(180deg, #2b1f1d 0%, #4a322c 50%, #2b1f1d 100%);
+            border: 2px solid #1a1210;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* Estilo dos Botões Relevados */
+        .btn-retro {
+            position: relative;
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: all 0.05s ease;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Botões Numéricos (Cinza escuro) */
+        .btn-num {
+            background: linear-gradient(180deg, #4a4d55 0%, #32353c 100%);
+            color: #f1f5f9;
+            box-shadow: 
+                0 5px 0 #1c1e22,
+                0 6px 6px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+        .btn-num:active, .btn-num.active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 1px 0 #1c1e22,
+                0 2px 3px rgba(0,0,0,0.4),
+                inset 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+        /* Botões de Operação (Laranja/Castanho Vintage) */
+        .btn-op {
+            background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
+            color: #fff8f0;
+            box-shadow: 
+                0 5px 0 #78350f,
+                0 6px 6px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-op:active, .btn-op.active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 1px 0 #78350f,
+                0 2px 3px rgba(0,0,0,0.4),
+                inset 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+        /* Botão Clear/Reset (Vermelho) */
+        .btn-clear {
+            background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+            color: #ffffff;
+            box-shadow: 
+                0 5px 0 #450a0a,
+                0 6px 6px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-clear:active, .btn-clear.active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 1px 0 #450a0a,
+                0 2px 3px rgba(0,0,0,0.4),
+                inset 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+        /* Botão Igualmente Importante (Igual '=') */
+        .btn-equal {
+            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff;
+            box-shadow: 
+                0 5px 0 #1e3a8a,
+                0 6px 6px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-equal:active, .btn-equal.active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 1px 0 #1e3a8a,
+                0 2px 3px rgba(0,0,0,0.4),
+                inset 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+        /* Interruptores deslizantes vintage */
+        .switch-bg {
+            background: #202124;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .switch-knob {
+            background: linear-gradient(180deg, #e2e8f0 0%, #94a3b8 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Corpo da Calculadora -->
+    <div class="retro-body w-full max-w-sm p-6 shadow-2xl border-b-8 border-r-4 border-black/20">
+        
+        <!-- Cabeçalho Vintage: Logo + Painel Solar -->
+        <div class="flex items-center justify-between mb-5 px-1">
+            <div class="flex flex-col">
+                <span class="text-xs font-black tracking-widest text-gray-700 uppercase" style="font-family: 'Press Start 2P', cursive; font-size: 9px;">TEXAS-80</span>
+                <span class="text-[10px] font-bold text-gray-500 tracking-wider">ELECTRONIC CALCULATOR</span>
+            </div>
+            
+            <!-- Painel Solar Decorativo -->
+            <div class="solar-panel w-20 h-6 rounded flex justify-between p-1">
+                <div class="w-1/4 h-full border-r border-amber-900/50"></div>
+                <div class="w-1/4 h-full border-r border-amber-900/50"></div>
+                <div class="w-1/4 h-full border-r border-amber-900/50"></div>
+                <div class="w-1/4 h-full"></div>
+            </div>
+        </div>
+
+        <!-- Chave do Som & Power -->
+        <div class="flex justify-between items-center mb-4 px-2 text-xs font-bold text-gray-600">
+            <div class="flex items-center space-x-2">
+                <span>SOM</span>
+                <button id="soundToggle" onclick="toggleSound()" class="switch-bg w-10 h-5 rounded-full p-0.5 relative transition-colors focus:outline-none">
+                    <div id="soundKnob" class="switch-knob w-4 h-4 rounded-full transition-transform"></div>
+                </button>
+            </div>
+            <div class="flex items-center space-x-1">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-[10px] tracking-wider text-gray-700">POWER ON</span>
+            </div>
+        </div>
+
+        <!-- Moldura do Display -->
+        <div class="display-bezel p-3 rounded-lg mb-6">
+            <!-- Tela VFD -->
+            <div class="vfd-screen rounded p-3 h-20 flex flex-col justify-between items-end relative">
+                
+                <!-- Linha Superior: Memória e Operador Atual -->
+                <div class="w-full flex justify-between items-center text-xs">
+                    <span id="memoryIndicator" class="vfd-op opacity-0">M</span>
+                    <span id="historyDisplay" class="vfd-op text-sm opacity-80 overflow-hidden whitespace-nowrap text-right max-w-[200px]"></span>
+                </div>
+
+                <!-- Display Principal (Camada de Fundo Esmaecida + Camada Ativa) -->
+                <div class="relative w-full text-right overflow-hidden">
+                    <!-- Fundo de Segmentos Apagados (Efeito LCD/VFD Real) -->
+                    <div class="vfd-text vfd-text-dim text-4xl leading-none absolute right-0 top-0 select-none pointer-events-none">
+                        888888888888
+                    </div>
+                    <!-- Valor Ativo -->
+                    <div id="display" class="vfd-text text-4xl leading-none tracking-normal z-10 relative">
+                        0
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teclado da Calculadora -->
+        <div class="grid grid-cols-4 gap-3">
+            
+            <!-- Linha 1 -->
+            <button onclick="handleAction('clear')" data-key="Escape" class="btn-retro btn-clear h-12 text-sm font-extrabold flex items-center justify-center">C / CE</button>
+            <button onclick="handleAction('toggle-sign')" data-key="±" class="btn-retro btn-num h-12 text-base font-bold flex items-center justify-center">+ / -</button>
+            <button onclick="handleAction('percent')" data-key="%" class="btn-retro btn-num h-12 text-base font-bold flex items-center justify-center">%</button>
+            <button onclick="handleAction('operator', '/')" data-key="/" class="btn-retro btn-op h-12 text-lg font-bold flex items-center justify-center">÷</button>
+
+            <!-- Linha 2 -->
+            <button onclick="handleAction('digit', '7')" data-key="7" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">7</button>
+            <button onclick="handleAction('digit', '8')" data-key="8" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">8</button>
+            <button onclick="handleAction('digit', '9')" data-key="9" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">9</button>
+            <button onclick="handleAction('operator', '*')" data-key="*" class="btn-retro btn-op h-12 text-lg font-bold flex items-center justify-center">×</button>
+
+            <!-- Linha 3 -->
+            <button onclick="handleAction('digit', '4')" data-key="4" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">4</button>
+            <button onclick="handleAction('digit', '5')" data-key="5" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">5</button>
+            <button onclick="handleAction('digit', '6')" data-key="6" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">6</button>
+            <button onclick="handleAction('operator', '-')" data-key="-" class="btn-retro btn-op h-12 text-xl font-bold flex items-center justify-center">-</button>
+
+            <!-- Linha 4 -->
+            <button onclick="handleAction('digit', '1')" data-key="1" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">1</button>
+            <button onclick="handleAction('digit', '2')" data-key="2" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">2</button>
+            <button onclick="handleAction('digit', '3')" data-key="3" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">3</button>
+            <button onclick="handleAction('operator', '+')" data-key="+" class="btn-retro btn-op h-12 text-xl font-bold flex items-center justify-center">+</button>
+
+            <!-- Linha 5 -->
+            <button onclick="handleAction('digit', '0')" data-key="0" class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center col-span-1">0</button>
+            <button onclick="handleAction('decimal')" data-key="." class="btn-retro btn-num h-12 text-xl font-bold flex items-center justify-center">.</button>
+            <button onclick="handleAction('backspace')" data-key="Backspace" class="btn-retro btn-num h-12 text-sm font-bold flex items-center justify-center">DEL</button>
+            <button onclick="handleAction('calculate')" data-key="Enter" class="btn-retro btn-equal h-12 text-xl font-bold flex items-center justify-center">=</button>
+
+        </div>
+
+        <!-- Rodapé da Carcaça com Textura -->
+        <div class="mt-6 flex justify-between items-center text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
+            <span>MODEL TI-1982</span>
+            <span>MADE IN JAPAN</span>
+        </div>
+
+    </div>
+
+    <!-- Script de Lógica da Calculadora e Som Synth Vintage -->
+    <script>
+        // Estado da Calculadora
+        let currentInput = '0';
+        let previousInput = null;
+        let activeOperator = null;
+        let shouldResetInput = false;
+        let isSoundEnabled = true;
+
+        // Elementos DOM
+        const displayEl = document.getElementById('display');
+        const historyDisplayEl = document.getElementById('historyDisplay');
+        const soundKnob = document.getElementById('soundKnob');
+
+        // Sintetizador de Som Web Audio API (Sem dependência de arquivos externos)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playKeyBeep(frequency = 600, duration = 0.03) {
+            if (!isSoundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new AudioContext();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'square'; // Som oitavado de relógio digital vintage
+                osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.error("Audio error:", e);
+            }
+        }
+
+        // Alternar Som
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            if (isSoundEnabled) {
+                soundKnob.style.transform = 'translateX(0px)';
+                playKeyBeep(800, 0.05);
+            } else {
+                soundKnob.style.transform = 'translateX(20px)';
+            }
+        }
+
+        // Atualização da Tela
+        function updateDisplay() {
+            // Limitar a exibição para no máximo 12 caracteres para caber na tela retrô
+            let formattedDisplay = currentInput;
+            
+            if (formattedDisplay.length > 12) {
+                const num = parseFloat(formattedDisplay);
+                if (!isNaN(num)) {
+                    formattedDisplay = num.toPrecision(7).toString();
+                } else {
+                    formattedDisplay = "ERROR";
+                }
+            }
+            
+            displayEl.textContent = formattedDisplay;
+
+            // Histórico do Operador
+            if (previousInput !== null && activeOperator !== null) {
+                const opSymbol = activeOperator === '*' ? '×' : activeOperator === '/' ? '÷' : activeOperator;
+                historyDisplayEl.textContent = `${previousInput} ${opSymbol}`;
+            } else {
+                historyDisplayEl.textContent = '';
+            }
+        }
+
+        // Ações da Calculadora
+        function handleAction(type, value = null) {
+            playKeyBeep(type === 'calculate' ? 900 : type === 'clear' ? 400 : 650);
+
+            switch (type) {
+                case 'digit':
+                    if (currentInput === '0' || shouldResetInput) {
+                        currentInput = value;
+                        shouldResetInput = false;
+                    } else {
+                        if (currentInput.replace('-', '').length < 10) {
+                            currentInput += value;
+                        }
+                    }
+                    break;
+
+                case 'decimal':
+                    if (shouldResetInput) {
+                        currentInput = '0.';
+                        shouldResetInput = false;
+                    } else if (!currentInput.includes('.')) {
+                        currentInput += '.';
+                    }
+                    break;
+
+                case 'toggle-sign':
+                    if (currentInput !== '0') {
+                        currentInput = currentInput.startsWith('-') ? currentInput.slice(1) : '-' + currentInput;
+                    }
+                    break;
+
+                case 'percent':
+                    currentInput = (parseFloat(currentInput) / 100).toString();
+                    break;
+
+                case 'backspace':
+                    if (shouldResetInput) break;
+                    if (currentInput.length > 1) {
+                        currentInput = currentInput.slice(0, -1);
+                        if (currentInput === '-') currentInput = '0';
+                    } else {
+                        currentInput = '0';
+                    }
+                    break;
+
+                case 'clear':
+                    currentInput = '0';
+                    previousInput = null;
+                    activeOperator = null;
+                    shouldResetInput = false;
+                    break;
+
+                case 'operator':
+                    if (activeOperator !== null && !shouldResetInput) {
+                        computeResult();
+                    }
+                    previousInput = currentInput;
+                    activeOperator = value;
+                    shouldResetInput = true;
+                    break;
+
+                case 'calculate':
+                    if (activeOperator !== null && previousInput !== null) {
+                        computeResult();
+                        previousInput = null;
+                        activeOperator = null;
+                        shouldResetInput = true;
+                    }
+                    break;
+            }
+
+            updateDisplay();
+        }
+
+        // Executa o Cálculo Matemático
+        function computeResult() {
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+
+            if (isNaN(prev) || isNaN(current)) return;
+
+            let result = 0;
+            switch (activeOperator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        currentInput = "ERRO: DIV/0";
+                        shouldResetInput = true;
+                        return;
+                    }
+                    result = prev / current;
+                    break;
+            }
+
+            // Arredondamento para evitar imprecisão de pontos flutuantes do JS
+            result = Math.round(result * 1e10) / 1e10;
+            currentInput = result.toString();
+        }
+
+        // Suporte para Entrada via Teclado Físico
+        window.addEventListener('keydown', (e) => {
+            let key = e.key;
+
+            // Mapeamento de teclas
+            if (key >= '0' && key <= '9') {
+                handleAction('digit', key);
+                animateButton(`[data-key="${key}"]`);
+            } else if (key === '.' || key === ',') {
+                handleAction('decimal');
+                animateButton('[data-key="."]');
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                handleAction('operator', key);
+                animateButton(`[data-key="${key}"]`);
+            } else if (key === 'Enter' || key === '=') {
+                e.preventDefault();
+                handleAction('calculate');
+                animateButton('[data-key="Enter"]');
+            } else if (key === 'Escape' || key.toLowerCase() === 'c') {
+                handleAction('clear');
+                animateButton('[data-key="Escape"]');
+            } else if (key === 'Backspace') {
+                handleAction('backspace');
+                animateButton('[data-key="Backspace"]');
+            } else if (key === '%') {
+                handleAction('percent');
+                animateButton('[data-key="%"]');
+            }
+        });
+
+        // Efeito Visual de Pressionar Tecla
+        function animateButton(selector) {
+            const btn = document.querySelector(selector);
+            if (btn) {
+                btn.classList.add('active');
+                setTimeout(() => {
+                    btn.classList.remove('active');
+                }, 100);
+            }
+        }
+
+        // Inicializar visual padrão ao carregar
+        window.onload = function () {
+            updateDisplay();
+        };
+    </script>
+</body>
+</html>
+```
